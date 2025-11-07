@@ -7,9 +7,9 @@ import {
 const router = express.Router();
 
 // 📤 Create a new submission
-router.post("/", createSubmission);
+router.post("/submit", createSubmission);
 
 // 📜 Get submissions by student name
-router.get("/:studentName", getSubmissionsByStudent);
+router.get("/submit/:studentName", getSubmissionsByStudent);
 
 export default router;

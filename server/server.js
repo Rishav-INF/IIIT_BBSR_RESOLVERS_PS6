@@ -15,22 +15,22 @@ connectDB();
 
 // ✅ Initialize Express app
 const app = express();
-app.use(cors());
+// app.use(cors());
 app.use(express.json()); // Parse JSON bodies
 
 // ✅ Create HTTP server for Socket.io
 const server = http.createServer(app);
 
 // ✅ Setup Socket.io
-const io = new Server(server, {
-  cors: {
-    origin: "http://localhost:5173", // React frontend URL
-    methods: ["GET", "POST"],
-  },
-});
+// const io = new Server(server, {
+//   cors: {
+//     origin: "http://localhost:5173", // React frontend URL
+//     methods: ["GET", "POST"],
+//   },
+// });
 
 // ✅ Initialize Socket.io logic
-initSocket(io);
+// initSocket(io);
 
 // ✅ API Routes (you will add these later)
 import userRoutes from "./routes/userRoutes.js";

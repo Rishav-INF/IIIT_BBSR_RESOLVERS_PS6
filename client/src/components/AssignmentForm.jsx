@@ -1,62 +1,92 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
+import axios from "axios";
 
 export default function AssignmentForm() {
   const [formData, setFormData] = useState({
     title: "",
+    description: "",
     deadline: "",
     language: "python",
-    testCases: [],
+    questionPdf: null,
+    inputFile: null,
+    outputFile: null,
   });
 
   const [message, setMessage] = useState("");
-  const [assignments, setAssignments] = useState([]); // Client-side storage
+  const [loading, setLoading] = useState(false);
 
-  // Input change handler
+  // Handle input field change
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // File upload handler
+  // Handle file uploads
   const handleFileChange = (e) => {
-    setFormData({ ...formData, testCases: Array.from(e.target.files) });
+    const { name, files } = e.target;
+    setFormData({ ...formData, [name]: files[0] });
   };
 
-  // Form submit
-  const handleSubmit = (e) => {
+  // Submit form
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setMessage("");
+    setLoading(true);
 
-    // === Client-side storage ===
-    const newAssignment = {
-      title: formData.title,
-      deadline: formData.deadline,
-      language: formData.language,
-      testCases: formData.testCases.map((file) => file.name),
-    };
-    setAssignments([...assignments, newAssignment]);
-    setMessage("✅ Assignment created successfully!");
-
-    // Reset form
-    setFormData({ title: "", deadline: "", language: "python", testCases: [] });
-
-    // === Backend integration placeholder ===
-    /*
     try {
+      const token = localStorage.getItem("token");
       const data = new FormData();
-      data.append("title", formData.title);
-      data.append("deadline", formData.deadline);
-      data.append("language", formData.language);
-      formData.testCases.forEach((file) => data.append("testCases", file));
 
-      await axios.post("/api/assignments", data, {
-        headers: { "Content-Type": "multipart/form-data" },
+      data.append("title", formData.title);
+      data.append(
+        "description",
+        formData.description || "No description provided"
+      );
+      data.append("deadline", new Date(formData.deadline).toISOString());
+      data.append("language", formData.language);
+
+      if (!formData.questionPdf || !formData.inputFile || !formData.outputFile) {
+        setMessage("❌ Please upload all 3 files (PDF, input.txt, output.txt)");
+        setLoading(false);
+        return;
+      }
+
+      data.append("questionPdf", formData.questionPdf);
+      data.append("inputFile", formData.inputFile);
+      data.append("outputFile", formData.outputFile);
+
+      const res = await axios.post(
+        "http://localhost:5000/api/assignments/create",
+        data,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      setMessage("✅ Assignment created successfully!");
+      console.log("Server Response:", res.data);
+
+      // Reset form
+      setFormData({
+        title: "",
+        description: "",
+        deadline: "",
+        language: "python",
+        questionPdf: null,
+        inputFile: null,
+        outputFile: null,
       });
-    } catch (err) {
-      console.error(err);
-      setMessage("❌ Failed to create assignment. Try again.");
+    } catch (error) {
+      console.error("Upload Error:", error);
+      setMessage(
+        "❌ Error creating assignment. Please check file format or authentication."
+      );
+    } finally {
+      setLoading(false);
     }
-    */
   };
 
   return (
@@ -70,6 +100,15 @@ export default function AssignmentForm() {
           value={formData.title}
           onChange={handleChange}
           placeholder="Assignment Title"
+          className="input-field"
+          required
+        />
+
+        <textarea
+          name="description"
+          value={formData.description}
+          onChange={handleChange}
+          placeholder="Assignment Description"
           className="input-field"
           required
         />
@@ -94,40 +133,47 @@ export default function AssignmentForm() {
           <option value="javascript">JavaScript</option>
         </select>
 
+        <label className="text-sm text-slate-300">Upload PDF Question:</label>
         <input
           type="file"
-          name="testCases"
-          multiple
+          name="questionPdf"
+          accept=".pdf"
           onChange={handleFileChange}
           className="input-field"
+          required
+        />
+
+        <label className="text-sm text-slate-300">Upload Input File (.txt):</label>
+        <input
+          type="file"
+          name="inputFile"
+          accept=".txt"
+          onChange={handleFileChange}
+          className="input-field"
+          required
+        />
+
+        <label className="text-sm text-slate-300">Upload Output File (.txt):</label>
+        <input
+          type="file"
+          name="outputFile"
+          accept=".txt"
+          onChange={handleFileChange}
+          className="input-field"
+          required
         />
 
         <motion.button
           whileTap={{ scale: 0.95 }}
           type="submit"
+          disabled={loading}
           className="submit-btn"
         >
-          Create Assignment
+          {loading ? "Uploading…" : "Create Assignment"}
         </motion.button>
       </form>
 
       {message && <p className="text-center mt-4">{message}</p>}
-
-      {/* Display assignments */}
-      {assignments.length > 0 && (
-        <div className="mt-6">
-          <h3 className="font-semibold mb-2">📄 Submitted Assignments</h3>
-          <ul>
-            {assignments.map((a, idx) => (
-              <li key={idx} className="mb-1 border-b border-gray-700 pb-1">
-                <strong>{a.title}</strong> - {a.language} - Deadline: {a.deadline}
-                <br />
-                Test Cases: {a.testCases.join(", ")}
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
     </div>
   );
 }

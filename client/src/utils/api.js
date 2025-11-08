@@ -1,30 +1,28 @@
+// client/src/utils/api.js
 import axios from "axios";
 
-// ✅ Create a single axios instance for all API requests
 const API = axios.create({
-  baseURL: "http://localhost:5000/api", // your Express backend base URL
-  headers: {
-    "Content-Type": "application/json",
-  },
+  baseURL: "http://localhost:5000/api",
 });
 
-// ================================
-// 📘 Instructor APIs
-// ================================
+// Attach token automatically
+API.interceptors.request.use((config) => {
+  const token = localStorage.getItem("token");
+  if (token) config.headers.Authorization = `Bearer ${token}`;
+  return config;
+});
 
-// Create a new assignment
+// === Instructor APIs ===
 export const createAssignment = async (assignmentData) => {
-  const res = await API.post("/assignments", assignmentData);
+  const res = await API.post("/assignments/create", assignmentData);
   return res.data;
 };
 
-// Fetch all assignments
 export const fetchAssignments = async () => {
-  const res = await API.get("/assignments");
+  const res = await API.get("/assignments/get");
   return res.data;
 };
 
-// Upload test cases (input/output files)
 export const uploadTestCases = async (formData) => {
   const res = await API.post("/assignments/upload", formData, {
     headers: { "Content-Type": "multipart/form-data" },
@@ -32,35 +30,33 @@ export const uploadTestCases = async (formData) => {
   return res.data;
 };
 
-// Get analytics data for an assignment
+// Analytics & Leaderboard
+export const fetchLeaderboard = async (assignmentId) => {
+  const res = await API.get(`/analytics/leaderboard/${assignmentId}`);
+  return res.data;
+};
+
 export const fetchAnalytics = async (assignmentId) => {
-  const res = await API.get(`/analytics/${assignmentId}`);
+  const res = await API.get(`/analytics/analytics/${assignmentId}`);
   return res.data;
 };
 
-// ================================
-// 🎓 Student APIs
-// ================================
-
-// Fetch all assignments (student view)
+// === Student APIs ===
 export const getAllAssignments = async () => {
-  const res = await API.get("/assignments");
+  const res = await API.get("/assignments/get");
   return res.data;
 };
 
-// Execute code (temporary run)
 export const executeCode = async (code, language) => {
   const res = await API.post("/execute", { code, language });
   return res.data;
 };
 
-// Submit code for grading
 export const submitAssignment = async (code, language, assignmentId) => {
   const res = await API.post("/submit", { code, language, assignmentId });
   return res.data;
 };
 
-// Get previous submissions for a student
 export const fetchSubmissions = async (studentId) => {
   const res = await API.get(`/submissions/${studentId}`);
   return res.data;

@@ -1,1 +1,63 @@
 @import "tailwindcss";
+
+/* Theme tokens */
+:root{
+  --bg:#0b0f14;
+  --panel:#0f1620;
+  --panel-2:#131c27;
+  --border:rgba(255,255,255,.08);
+  --text:#e8eef6;
+  --muted:#a7b4c4;
+  --brand:#7c5cff;
+  --brand-2:#4cc9f0;
+}
+
+html, body, #root { height: 100%; }
+body{
+  margin:0;
+  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  color:var(--text);
+  background:
+    radial-gradient(900px 600px at 80% -10%, rgba(124,92,255,.16), transparent),
+    radial-gradient(900px 600px at -10% 110%, rgba(76,201,240,.12), transparent),
+    var(--bg);
+}
+
+/* Reusable primitives */
+.container-app{ @apply max-w-6xl mx-auto px-4; }
+.card{
+  background: linear-gradient(180deg, var(--panel), var(--panel-2));
+  border:1px solid var(--border);
+  @apply rounded-2xl shadow-xl;
+}
+.btn{
+  @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2 text-sm font-medium transition;
+  border:1px solid var(--border);
+  background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+}
+.btn:hover{ @apply -translate-y-[1px]; }
+.btn-primary{
+  border-color: transparent;
+  background: linear-gradient(180deg, var(--brand), #5a3dff);
+  @apply text-white;
+}
+.input{
+  @apply w-full rounded-xl px-3 py-2 bg-[#0e1420] text-[15px] border outline-none;
+  border-color: var(--border);
+}
+.input:focus{ @apply ring-2 ring-indigo-500/40; }
+.table-base{
+  @apply w-full text-sm border-separate;
+  border-spacing: 0 10px;
+}
+.table-base th{ @apply text-left text-slate-300 px-3 py-2 font-medium; }
+.table-base td{
+  @apply bg-slate-900/50 px-3 py-3 border border-slate-700/50;
+}
+.table-base tr td:first-child{ @apply rounded-l-xl; }
+.table-base tr td:last-child{ @apply rounded-r-xl; }
+.badge{
+  @apply inline-flex items-center rounded-lg px-2 py-0.5 text-xs border;
+  border-color: rgba(124,92,255,.35);
+  background: rgba(124,92,255,.15);
+}

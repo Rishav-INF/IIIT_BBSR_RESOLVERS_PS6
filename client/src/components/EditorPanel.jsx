@@ -1,66 +1,34 @@
-import React, { useState } from "react";
+import React from "react";
 import Editor from "@monaco-editor/react";
-import { motion } from "framer-motion";
-const onRun = async (code) => {
-    console.log("Running code:", code);
-    return { output: "Mock output from server" };
-};
-export default function EditorPanel({ language = "python"}) {
-  const [code, setCode] = useState("");
-  const [output, setOutput] = useState(""); // Client-side output
-  const [isRunning, setIsRunning] = useState(false);
 
-  // Mock client-side run function
+export default function EditorPanel({
+  language = "python3",
+  code,
+  setCode,
+  stdin,
+  setStdin,
+  onRun,
+  isRunning,
+}) {
   const handleRun = async () => {
-    setIsRunning(true);
-    setOutput(""); // Reset previous output
-
-    // === Client-side mock execution ===
-    // For demonstration, we just echo the code or simulate output
-    setTimeout(() => {
-      setOutput(`✅ Code executed successfully!\n\nYour code:\n${code}`);
-      setIsRunning(false);
-    }, 1000);
-
-    // === Backend API integration placeholder ===
-    // Uncomment and adjust when connecting to backend:
-    /*
-    if (onRun) {
-      try {
-        setIsRunning(true);
-        const result = await onRun(code); // e.g., POST to API
-        setOutput(result.output);
-      } catch (err) {
-        setOutput("❌ Error running code.");
-        console.error(err);
-      } finally {
-        setIsRunning(false);
-      }
-    }
-    */
+    if (!code?.trim()) return;
+    await onRun({ code, language, stdin });
   };
 
   return (
-    <div className="flex flex-col w-full h-full bg-gray-900 text-white rounded-2xl shadow-lg border border-gray-800">
-      {/* Header */}
-      <div className="flex items-center justify-between px-4 py-2 bg-gray-800 rounded-t-2xl">
+    <div className="card text-white">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-white/10">
         <h2 className="text-lg font-semibold">Code Editor</h2>
-        <motion.button
-          whileTap={{ scale: 0.9 }}
+        <button
           onClick={handleRun}
           disabled={isRunning}
-          className={`px-4 py-1 rounded-md text-sm font-medium ${
-            isRunning
-              ? "bg-gray-600 cursor-not-allowed"
-              : "bg-blue-600 hover:bg-blue-500"
-          }`}
+          className={`btn ${isRunning ? "" : "btn-primary"}`}
         >
-          {isRunning ? "Running..." : "Run Code"}
-        </motion.button>
+          {isRunning ? "Running…" : "Run Code"}
+        </button>
       </div>
 
-      {/* Monaco Editor */}
-      <div className="flex-1">
+      <div className="px-2">
         <Editor
           height="60vh"
           defaultLanguage={language}
@@ -76,9 +44,14 @@ export default function EditorPanel({ language = "python"}) {
         />
       </div>
 
-      {/* Output Panel */}
-      <div className="mt-2 p-3 bg-gray-800 rounded-b-2xl h-32 overflow-auto font-mono text-sm">
-        <pre>{output}</pre>
+      <div className="p-3 border-t border-white/10 bg-black/30 rounded-b-2xl">
+        <label className="block text-xs mb-1 text-slate-300">Standard Input</label>
+        <textarea
+          className="input h-24 bg-[#0e1420]"
+          placeholder="e.g.&#10;5&#10;3"
+          value={stdin}
+          onChange={(e) => setStdin(e.target.value)}
+        />
       </div>
     </div>
   );

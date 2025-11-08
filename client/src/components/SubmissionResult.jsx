@@ -3,52 +3,42 @@ import { motion } from "framer-motion";
 
 export default function SubmissionResult({ results, totalScore }) {
   return (
-    <div className="w-full bg-gray-900 text-white rounded-2xl shadow-lg border border-gray-800 mt-4">
-      {/* Header */}
-      <div className="flex items-center justify-between px-4 py-2 bg-gray-800 rounded-t-2xl">
+    <div className="card mt-4 overflow-hidden">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-white/10">
         <h2 className="text-lg font-semibold">Submission Results</h2>
-        <span className="text-sm text-gray-300">Total Score: {totalScore}</span>
+        <span className="badge">Total: {totalScore}</span>
       </div>
 
-      {/* Results Table */}
-      <div className="p-4 overflow-y-auto max-h-64">
-        {results.length === 0 ? (
-          <p className="text-gray-500 text-sm">No submissions yet.</p>
+      <div className="p-4">
+        {(!results || results.length === 0) ? (
+          <p className="text-slate-300 text-sm">No submissions yet.</p>
         ) : (
-          <table className="w-full text-sm border-separate border-spacing-y-2">
+          <table className="table-base">
             <thead>
-              <tr className="text-gray-400 text-left">
-                <th className="py-1 px-2">#</th>
-                <th className="py-1 px-2">Input</th>
-                <th className="py-1 px-2">Expected Output</th>
-                <th className="py-1 px-2">Your Output</th>
-                <th className="py-1 px-2">Result</th>
-                <th className="py-1 px-2 text-right">Points</th>
+              <tr>
+                <th>#</th><th>Input</th><th>Expected</th><th>Your Output</th><th>Result</th><th className="text-right">Points</th>
               </tr>
             </thead>
             <tbody>
-              {results.map((test, index) => (
+              {results.map((t, i) => (
                 <motion.tr
-                  key={index}
+                  key={i}
                   initial={{ opacity: 0, y: 5 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                  className="bg-gray-800 hover:bg-gray-700 rounded-lg"
+                  transition={{ delay: i * 0.06 }}
                 >
-                  <td className="py-1 px-2">{index + 1}</td>
-                  <td className="py-1 px-2 text-gray-300">{test.input}</td>
-                  <td className="py-1 px-2 text-gray-300">{test.expected}</td>
-                  <td className="py-1 px-2 text-gray-300">{test.output}</td>
-                  <td className="py-1 px-2">
-                    {test.passed ? (
+                  <td>{i + 1}</td>
+                  <td className="text-slate-300">{t.input}</td>
+                  <td className="text-slate-300">{t.expected}</td>
+                  <td className="text-slate-300">{t.output}</td>
+                  <td>
+                    {t.passed ? (
                       <span className="text-green-400 font-semibold">✅ Pass</span>
                     ) : (
                       <span className="text-red-400 font-semibold">❌ Fail</span>
                     )}
                   </td>
-                  <td className="py-1 px-2 text-right text-gray-200">
-                    {test.points}
-                  </td>
+                  <td className="text-right">{t.points}</td>
                 </motion.tr>
               ))}
             </tbody>
